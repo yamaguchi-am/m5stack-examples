@@ -5,8 +5,7 @@
 #include <M5StickCPlus.h>
 #include <MadgwickAHRS.h>
 
-#define BUFSIZE 100
-
+const size_t kCalibDataSize = 100;
 const float kSamplingFrequency = 100.;
 const float kIntervalMicros = 1e6 / kSamplingFrequency;
 
@@ -14,12 +13,12 @@ struct Gyro {
   float x;
   float y;
   float z;
-} origin = {0., 0., 0.};
+};
 
 class GyroCalibrationData {
  public:
   void Add(float x, float y, float z);
-  const Gyro &GetOrigin() const { return origin_; };
+  const Gyro &GetOffset() const { return offset_; };
   bool Ready() const { return ready_; }
   void Clear() {
     ready_ = 0;
@@ -27,12 +26,12 @@ class GyroCalibrationData {
   }
 
  private:
-  float x_[BUFSIZE];
-  float y_[BUFSIZE];
-  float z_[BUFSIZE];
+  float x_[kCalibDataSize];
+  float y_[kCalibDataSize];
+  float z_[kCalibDataSize];
   int count_;
   bool ready_;
-  Gyro origin_;
+  Gyro offset_;
 };
 
 float Average(float *data, size_t n) {
@@ -44,17 +43,17 @@ float Average(float *data, size_t n) {
 }
 
 void GyroCalibrationData::Add(float x, float y, float z) {
-  if (count_ < BUFSIZE) {
+  if (count_ < kCalibDataSize) {
     x_[count_] = x;
     y_[count_] = y;
     z_[count_] = z;
     count_++;
-    if (count_ == BUFSIZE) {
+    if (count_ == kCalibDataSize) {
       // TODO: Evaluate the variance to make sure the unit was kept stable
       // during calibration.
-      origin_.x = Average(x_, BUFSIZE);
-      origin_.y = Average(y_, BUFSIZE);
-      origin_.z = Average(z_, BUFSIZE);
+      offset_.x = Average(x_, kCalibDataSize);
+      offset_.y = Average(y_, kCalibDataSize);
+      offset_.z = Average(z_, kCalibDataSize);
       ready_ = true;
     }
   }
@@ -84,7 +83,7 @@ void M5StackIMUManager::Update(float sampling_frequency, float gyro_x,
     calib_data_.Add(gyro_x, gyro_y, gyro_z);
   }
 
-  const auto &o = calib_data_.GetOrigin();
+  const auto &o = calib_data_.GetOffset();
   gyro_x = gyro_x - o.x;
   gyro_y = gyro_y - o.y;
   gyro_z = gyro_z - o.z;
