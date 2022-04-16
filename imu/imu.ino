@@ -1,8 +1,20 @@
-// A simple example of IMU using M5StickCPlus.
+// A simple example of IMU using M5StickCPlus / M5StackFire.
 // Install Madgwick library from Arduino's Library Manager.
 // https://github.com/arduino-libraries/MadgwickAHRS
 
+#ifdef ARDUINO_M5Stick_C_PLUS
+
 #include <M5StickCPlus.h>
+
+#elif defined(ARDUINO_M5STACK_FIRE)
+
+#define M5STACK_MPU6886
+#include <M5Stack.h>
+
+#else
+#error("selected board is not yet supported")
+#endif
+
 #include <MadgwickAHRS.h>
 
 const size_t kCalibDataSize = 100;
@@ -102,8 +114,13 @@ void M5StackIMUManager::GetAHRSData(float *pitch, float *roll, float *yaw) {
 
 void M5StackIMUManager::Init() {
   M5.IMU.Init();
+#ifdef ARDUINO_M5Stick_C_PLUS
   M5.IMU.SetGyroFsr(MPU6886::GFS_2000DPS);
   M5.IMU.SetAccelFsr(MPU6886::AFS_2G);
+#else
+  M5.IMU.setGyroFsr(MPU6886::GFS_2000DPS);
+  M5.IMU.setAccelFsr(MPU6886::AFS_2G);
+#endif
   StartCalibration();
 }
 
@@ -112,7 +129,9 @@ long last_time_micros;
 
 void setup() {
   M5.begin();
+#ifdef ARDUINO_M5Stick_C_PLUS
   M5.Lcd.setRotation(3);
+#endif
   M5.Lcd.fillScreen(BLACK);
   M5.Lcd.setTextSize(1);
   M5.Lcd.setCursor(80, 15);
