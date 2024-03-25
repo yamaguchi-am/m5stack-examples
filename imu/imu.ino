@@ -2,7 +2,7 @@
 // Install Madgwick library from Arduino's Library Manager.
 // https://github.com/arduino-libraries/MadgwickAHRS
 
-#ifdef ARDUINO_M5Stick_C_PLUS
+#ifdef ARDUINO_M5STACK_STICKC_PLUS
 
 #include <M5StickCPlus.h>
 
@@ -25,7 +25,7 @@ long last_time_micros;
 
 void setup() {
   M5.begin();
-#ifdef ARDUINO_M5Stick_C_PLUS
+#ifdef ARDUINO_M5STACK_STICKC_PLUS
   M5.Lcd.setRotation(3);
 #endif
   M5.Lcd.fillScreen(BLACK);

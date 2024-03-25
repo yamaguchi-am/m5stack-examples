@@ -1,6 +1,6 @@
 #include "imu.h"
 
-#ifdef ARDUINO_M5Stick_C_PLUS
+#ifdef ARDUINO_M5STACK_STICKC_PLUS
 
 #include <M5StickCPlus.h>
 
@@ -68,7 +68,7 @@ void M5StackIMUManager::GetAHRSData(float *pitch, float *roll, float *yaw) {
 
 void M5StackIMUManager::Init() {
   M5.IMU.Init();
-#ifdef ARDUINO_M5Stick_C_PLUS
+#ifdef ARDUINO_M5STACK_STICKC_PLUS
   M5.IMU.SetGyroFsr(MPU6886::GFS_2000DPS);
   M5.IMU.SetAccelFsr(MPU6886::AFS_2G);
 #else
